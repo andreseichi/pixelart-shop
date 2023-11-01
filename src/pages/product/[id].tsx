@@ -2,6 +2,7 @@ import { ProductSkeleton } from "@/components/Skeleton/ProductSkeleton";
 import { stripe } from "@/lib/stripe";
 import axios from "axios";
 import { GetStaticPaths, GetStaticProps } from "next";
+import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -48,35 +49,43 @@ export default function Product({ product }: ProductProps) {
   }
 
   return (
-    <main className="m-auto grid max-w-[1180px] grid-cols-2 items-stretch gap-16">
-      <div className="flex h-[656px] w-full max-w-[576px] items-center justify-center rounded-lg bg-[linear-gradient(180deg,_#1ea483_0%,_#7465d4_100%)] object-cover p-1">
-        <Image
-          className="object-cover"
-          src={product.imageUrl}
-          width={520}
-          height={480}
-          alt={product.name}
-        />
-      </div>
+    <>
+      <Head>
+        <title>{product.name} | PixelArt Shop</title>
+      </Head>
 
-      <div className="flex flex-col">
-        <h1 className="text-2xl font-semibold text-gray-300">{product.name}</h1>
+      <main className="m-auto grid max-w-[1180px] grid-cols-2 items-stretch gap-16">
+        <div className="flex h-[656px] w-full max-w-[576px] items-center justify-center rounded-lg bg-[linear-gradient(180deg,_#1ea483_0%,_#7465d4_100%)] object-cover p-1">
+          <Image
+            className="object-cover"
+            src={product.imageUrl}
+            width={520}
+            height={480}
+            alt={product.name}
+          />
+        </div>
 
-        <span className="mt-4 block text-2xl text-green-400">
-          {product.price}
-        </span>
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-semibold text-gray-300">
+            {product.name}
+          </h1>
 
-        <p className="mt-10 leading-7 text-gray-300">{product.description}</p>
+          <span className="mt-4 block text-2xl text-green-400">
+            {product.price}
+          </span>
 
-        <button
-          disabled={isCreatingCheckoutSession}
-          onClick={handleBuyProduct}
-          className="[&:not(:disabled)hover:brightness-90] mt-auto cursor-pointer rounded-lg border-none bg-green-600 p-5 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          Comprar agora
-        </button>
-      </div>
-    </main>
+          <p className="mt-10 leading-7 text-gray-300">{product.description}</p>
+
+          <button
+            disabled={isCreatingCheckoutSession}
+            onClick={handleBuyProduct}
+            className="[&:not(:disabled)hover:brightness-90] mt-auto cursor-pointer rounded-lg border-none bg-green-600 p-5 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Comprar agora
+          </button>
+        </div>
+      </main>
+    </>
   );
 }
 
