@@ -18,7 +18,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <Image src={logoImg} alt="Logo Image" />
       </header>
 
-      <main className={`${roboto.variable} w-full font-sans`}>
+      <main className={`${roboto.variable} w-full flex-1 font-sans`}>
         <Component {...pageProps} />
       </main>
     </div>
