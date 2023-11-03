@@ -1,4 +1,4 @@
-import { roboto } from "@/pages/_app";
+import { roboto } from "@/fonts";
 import * as DialogRUI from "@radix-ui/react-dialog";
 import React from "react";
 
