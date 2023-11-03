@@ -165,7 +165,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   </div>
 
                   <div className="flex justify-between font-bold text-zinc-200">
-                    <span className="text-lg">Valor total</span>
+                    <span className="text-lg">Total</span>
                     <span className="text-2xl">
                       {new Intl.NumberFormat("pt-BR", {
                         style: "currency",
