@@ -11,6 +11,8 @@ import Stripe from "stripe";
 
 import cartIcon from "@/assets/cart.svg";
 import { useCart } from "@/stores/useCart";
+import { Arrow } from "@/components/Arrow";
+import { useState } from "react";
 
 export type Product = {
   id: string;
@@ -25,10 +27,20 @@ interface HomeProps {
 }
 
 export default function Home({ products }: HomeProps) {
-  const [sliderRef] = useKeenSlider({
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [loadedSlide, setLoadedSlide] = useState(false);
+
+  const [sliderRef, instanceRef] = useKeenSlider({
+    initial: 0,
     slides: {
       perView: 3,
       spacing: 48,
+    },
+    slideChanged(slider) {
+      setCurrentSlide(slider.track.details.rel);
+    },
+    created() {
+      setLoadedSlide(true);
     },
   });
 
@@ -46,7 +58,7 @@ export default function Home({ products }: HomeProps) {
 
       <div
         ref={sliderRef}
-        className="keen-slider ml-auto flex min-h-[656px] w-full max-w-[calc(100vw-((100vw-1180px)/2))]"
+        className="keen-slider relative ml-auto flex min-h-[656px] w-full max-w-[calc(100vw-((100vw-1180px)/2))]"
       >
         {products.map((product) => (
           <Link
@@ -92,7 +104,51 @@ export default function Home({ products }: HomeProps) {
             </div>
           </Link>
         ))}
+
+        {loadedSlide && instanceRef.current && (
+          <>
+            <Arrow
+              left
+              onClick={(e: any) =>
+                e.stopPropagation() || instanceRef.current?.prev()
+              }
+              disabled={currentSlide === 0}
+            />
+
+            <Arrow
+              onClick={(e: any) =>
+                e.stopPropagation() || instanceRef.current?.next()
+              }
+              disabled={
+                currentSlide ===
+                instanceRef.current.track.details.slides.length - 1
+              }
+            />
+          </>
+        )}
       </div>
+      {loadedSlide && instanceRef.current && (
+        <div className="mt-4 flex justify-center gap-1 px-[10px] py-0">
+          {[
+            ...Array(
+              instanceRef.current.track.details.slides.length - 2,
+            ).keys(),
+          ].map((idx) => {
+            return (
+              <button
+                key={idx}
+                onClick={() => {
+                  instanceRef.current?.moveToIdx(idx);
+                }}
+                className={
+                  "mx-0 my-[5px] h-[10px] w-[10px] cursor-pointer rounded-full border-none bg-zinc-50 p-[5px]" +
+                  (currentSlide === idx ? " bg-black" : "")
+                }
+              ></button>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 }
