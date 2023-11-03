@@ -115,7 +115,7 @@ export default function Product({ product }: ProductProps) {
             <button
               disabled={isCreatingCheckoutSession}
               onClick={handleAddCart}
-              className="[&:not(:disabled)hover:brightness-90] cursor-pointer rounded-lg border-none bg-fuchsia-600 p-4 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer rounded-lg border-none bg-fuchsia-600 p-4 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 [&:not(:disabled)]:hover:brightness-90"
             >
               Add to Cart
             </button>
@@ -123,7 +123,7 @@ export default function Product({ product }: ProductProps) {
             <button
               disabled={isCreatingCheckoutSession}
               onClick={handleBuyProduct}
-              className="[&:not(:disabled)hover:brightness-90] cursor-pointer rounded-lg border-none bg-purple-600 p-4 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer rounded-lg border-none bg-purple-600 p-4 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 [&:not(:disabled)]:hover:brightness-90"
             >
               Buy Now
             </button>
