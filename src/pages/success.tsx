@@ -27,7 +27,7 @@ export default function Success({
 
   useEffect(() => {
     clearCart();
-  }, []);
+  }, [clearCart]);
 
   return (
     <>
