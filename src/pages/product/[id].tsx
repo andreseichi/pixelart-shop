@@ -1,5 +1,6 @@
 import { ProductSkeleton } from "@/components/Skeleton/ProductSkeleton";
 import { stripe } from "@/lib/stripe";
+import { useCart } from "@/stores/useCart";
 import axios from "axios";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
@@ -7,28 +8,57 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Stripe from "stripe";
+import { shallow } from "zustand/shallow";
 
+type Product = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  price: number;
+  description: string;
+  defaultPriceId: string;
+};
 interface ProductProps {
-  product: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    price: number;
-    description: string;
-    defaultPriceId: string;
-  };
+  product: Product;
 }
 
 export default function Product({ product }: ProductProps) {
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false);
 
+  const { addProduct, cart } = useCart(({ addProduct, cart }) => ({
+    addProduct,
+    cart,
+  }));
+
   const { isFallback } = useRouter();
+
+  function handleAddCart() {
+    const productFormated = {
+      id: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      price: product.price,
+      defaultPriceId: product.defaultPriceId,
+    };
+
+    addProduct(productFormated);
+  }
 
   async function handleBuyProduct() {
     try {
+      const productFormated = {
+        id: product.id,
+        name: product.name,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        defaultPriceId: product.defaultPriceId,
+      };
+
+      const cartUpdated = addProduct(productFormated);
+
       const response = await axios.post("/api/checkout", {
-        priceId: product.defaultPriceId,
+        products: cartUpdated,
       });
 
       const { checkoutUrl } = response.data;
@@ -48,10 +78,12 @@ export default function Product({ product }: ProductProps) {
     );
   }
 
+  const title = `${product.name} | PixelArt Shop`;
+
   return (
     <>
       <Head>
-        <title>{product.name} | PixelArt Shop</title>
+        <title>{title}</title>
       </Head>
 
       <main className="m-auto grid max-w-[1180px] grid-cols-2 items-stretch gap-16">
@@ -71,18 +103,31 @@ export default function Product({ product }: ProductProps) {
           </h1>
 
           <span className="mt-4 block text-2xl text-green-400">
-            {product.price}
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }).format(product.price)}
           </span>
 
           <p className="mt-10 leading-7 text-gray-300">{product.description}</p>
 
-          <button
-            disabled={isCreatingCheckoutSession}
-            onClick={handleBuyProduct}
-            className="[&:not(:disabled)hover:brightness-90] mt-auto cursor-pointer rounded-lg border-none bg-green-600 p-5 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Comprar agora
-          </button>
+          <div className="mt-auto flex flex-col gap-4">
+            <button
+              disabled={isCreatingCheckoutSession}
+              onClick={handleAddCart}
+              className="[&:not(:disabled)hover:brightness-90] cursor-pointer rounded-lg border-none bg-fuchsia-600 p-4 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Add to Cart
+            </button>
+
+            <button
+              disabled={isCreatingCheckoutSession}
+              onClick={handleBuyProduct}
+              className="[&:not(:disabled)hover:brightness-90] cursor-pointer rounded-lg border-none bg-purple-600 p-4 text-lg font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
       </main>
     </>
@@ -106,10 +151,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
         id: product.id,
         name: product.name,
         imageUrl: product.images[0],
-        price: new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(price.unit_amount ? price.unit_amount / 100 : 0),
+        price: price.unit_amount ? price.unit_amount / 100 : 0,
         description: product.description,
         defaultPriceId: price.id,
       },

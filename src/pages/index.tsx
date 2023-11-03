@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import Head from "next/head";
 
 import { useKeenSlider } from "keen-slider/react";
 
@@ -9,13 +9,19 @@ import { stripe } from "@/lib/stripe";
 import "keen-slider/keen-slider.min.css";
 import Stripe from "stripe";
 
+import cartIcon from "@/assets/cart.svg";
+import { useCart } from "@/stores/useCart";
+
+export type Product = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  price: number;
+  defaultPriceId: string;
+};
+
 interface HomeProps {
-  products: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    price: string;
-  }[];
+  products: Product[];
 }
 
 export default function Home({ products }: HomeProps) {
@@ -25,6 +31,12 @@ export default function Home({ products }: HomeProps) {
       spacing: 48,
     },
   });
+
+  const { addProduct } = useCart((state) => state);
+
+  function handleAddCart(product: any) {
+    addProduct(product);
+  }
 
   return (
     <>
@@ -51,11 +63,31 @@ export default function Home({ products }: HomeProps) {
                 alt="dog product"
               />
 
-              <footer className="absolute bottom-1 left-1 right-1 flex translate-y-[110%] items-center justify-between rounded-md bg-black/60 p-8 opacity-0 transition-all ease-in-out group-hover:translate-y-0 group-hover:opacity-100">
-                <strong className="text-lg">{product.name}</strong>
-                <span className="text-xl font-bold text-green-400">
-                  {product.price}
-                </span>
+              <footer className="absolute bottom-1 left-1 right-1 flex translate-y-[110%] items-center justify-between rounded-md bg-black/60 px-3 py-4 opacity-0 transition-all ease-in-out group-hover:translate-y-0 group-hover:opacity-100">
+                <div className="flex flex-col">
+                  <strong className="text-lg">{product.name}</strong>
+                  <span className="text-xl font-bold text-green-400">
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(product.price)}
+                  </span>
+                </div>
+
+                <div
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddCart(product);
+                  }}
+                  className="rounded-lg bg-purple-600 p-2 hover:brightness-90"
+                >
+                  <Image
+                    src={cartIcon}
+                    width={32}
+                    height={32}
+                    alt="Add to Cart"
+                  />
+                </div>
               </footer>
             </div>
           </Link>
@@ -77,10 +109,8 @@ export const getStaticProps: GetStaticProps = async () => {
       id: product.id,
       name: product.name,
       imageUrl: product.images[0],
-      price: new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(price.unit_amount ? price.unit_amount / 100 : 0),
+      price: price.unit_amount ? price.unit_amount / 100 : 0,
+      defaultPriceId: price.id,
     };
   });
 
