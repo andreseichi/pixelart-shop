@@ -19,6 +19,6 @@
   <img src="./screenshots/screenshot4.png" alt="Screenshot">
 </div>
 
-> E-commerce of my pixel arts
+> E-commerce of my pixel arts with payment managed by Stripe. So yes, it is safe.
 
 **If you want to support me, you can ["buy"](https://pixelart-shop.vercel.app/) some of my arts :D**
