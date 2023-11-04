@@ -162,11 +162,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [
-      {
-        params: { id: "prod_OvaD9whPGu84NJ" },
-      },
-    ],
+    paths: [],
     fallback: true,
   };
 };
